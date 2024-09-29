@@ -34,11 +34,14 @@ public:
         std::string res_user_creds = login + ":" + password;
         std::string line;
         std::fstream file;
+        std::cout << "Path of users file: " << (std::string)"user_list.txt" << std::endl;
         file.open("user_list.txt");
         if (file.is_open()) {
+            std::cout << "File is opened";
             while(std::getline(file, line)) {
                 if (line==res_user_creds) {
                     file.close();
+                    std::cout << "Line: " << line << std::endl;
                     return true;
                 }
             }
@@ -50,9 +53,9 @@ public:
     void SendMes(std::string to_user, std::string message) {
         if (CheckCreds()) {
             std::fstream file;
-            file.open("chats/" + this->login + "-" + to_user + ".txt");
+            file.open((std::string)"chats/" + this->login + "-" + to_user + ".txt", std::ios::app);
             if (file.is_open()) {
-                file << "User:" << this->login << ":" << message << "\n";
+                file << this->login << "->" << message << "\n";
             }
             file.close();
         }
@@ -105,7 +108,7 @@ public:
 
         char recv_buf[512];
         int recv_buf_len = 512;
-
+        std::cerr << "ParseMessageFromClient Running" << std::endl;
         int iResult = recv(ClientSocket, recv_buf, recv_buf_len, 0);
 
         if (iResult < 0) {
@@ -136,7 +139,7 @@ public:
                     closesocket(ClientSocket);
                     return false;
                 }
-
+                std::cerr << "Message: " << message << std::endl;
                 std::string to_user = UserData.substr(0, del2);
                 std::string data = UserData.substr(del2+1, to_user.length()-del2-1);
 
@@ -145,6 +148,7 @@ public:
             }
             else if (command=="get_chat_history") {
                 std::string to_user = message.substr(del+1, message.length()-del-1);
+                std::cerr << "Message: " << message << std::endl;
                 std::string messages = this->SendChatWith(to_user);
                 messages = messages + "\n";
                 send(ClientSocket, messages.c_str(), 512,0);
@@ -158,12 +162,13 @@ public:
     std::string SendChatWith(std::string user) {
         std::fstream file;
         std::string messages;
+        std::cerr << "chats/" + login + "-" + user + ".txt" << std::endl;
         file.open("chats/" + login + "-" + user + ".txt");
         if (file.is_open()) {
             while(!file.eof()) {
                 std::string buf;
                 std::getline(file, buf);
-                messages = messages + buf;
+                messages = messages + '\n' + buf;
             }
         }
         return messages;
@@ -197,17 +202,21 @@ private:
         //Получение пароля с клиента
         c.GetPasswordFromClient(ClientSocket);
 
-        if (c.CheckCreds()==false) {
-            send(ClientSocket, "Auth error", 512, 0);
-            closesocket(ClientSocket);
-            return;
-        } else {
-            send(ClientSocket, "Auth success", 512, 0);
-        }
+        std::cerr << "Login and password get from client" << std::endl;
 
+        while (c.CheckCreds()==false) {
+            send(ClientSocket, "Auth error", 512, 0);
+            std::cerr << "Auth error" << std::endl;
+
+            c.GetLoginFromClient(ClientSocket);
+            c.GetPasswordFromClient(ClientSocket);
+        }
+        send(ClientSocket, "Auth success", 512, 0);
+        std::cerr << "Auth is done" << std::endl;
         // Получение сообщения
         bool res_get_mes = true;
         while (res_get_mes) {
+            std::cerr << "Start of Parsing new command" << std::endl;
             res_get_mes = c.ParseMessageFromClient(ClientSocket);
         }
         closesocket(ClientSocket);

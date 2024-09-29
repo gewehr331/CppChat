@@ -55,12 +55,6 @@ build CMakeFiles/CppChat.dir/server.cpp.obj: CXX_COMPILER__CppChat_unscanned_Deb
   OBJECT_DIR = CMakeFiles\CppChat.dir
   OBJECT_FILE_DIR = CMakeFiles\CppChat.dir
 
-build CMakeFiles/CppChat.dir/client.cpp.obj: CXX_COMPILER__CppChat_unscanned_Debug C$:/Users/Саша/CLionProjects/CppChat/client.cpp || cmake_object_order_depends_target_CppChat
-  DEP_FILE = CMakeFiles\CppChat.dir\client.cpp.obj.d
-  FLAGS = -g -fdiagnostics-color=always
-  OBJECT_DIR = CMakeFiles\CppChat.dir
-  OBJECT_FILE_DIR = CMakeFiles\CppChat.dir
-
 
 # =============================================================================
 # Link build statements for EXECUTABLE target CppChat
@@ -69,9 +63,9 @@ build CMakeFiles/CppChat.dir/client.cpp.obj: CXX_COMPILER__CppChat_unscanned_Deb
 #############################################
 # Link the executable CppChat.exe
 
-build CppChat.exe: CXX_EXECUTABLE_LINKER__CppChat_Debug CMakeFiles/CppChat.dir/server.cpp.obj CMakeFiles/CppChat.dir/client.cpp.obj
+build CppChat.exe: CXX_EXECUTABLE_LINKER__CppChat_Debug CMakeFiles/CppChat.dir/server.cpp.obj
   FLAGS = -g
-  LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+  LINK_LIBRARIES = -lwsock32  -lws2_32  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\CppChat.dir
   POST_BUILD = cd .
   PRE_LINK = cd .

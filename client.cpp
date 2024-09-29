@@ -12,6 +12,7 @@
 
 #define SERVER_PORT "9000"
 #define SERVER_NAME "localhost"
+
 /*
 SOCKET ClientInitialization() {
     WSADATA WsaData;
@@ -128,6 +129,9 @@ public:
 
     }
 
+    std::string GetLogin() {
+        return this->login;
+    }
     bool Authenticate(std::string login_, std::string password) {
 
         int iResult = 0;
@@ -174,35 +178,48 @@ public:
 };
 int main() {
 
+
+
+    std::cout << "Hello! This is simple TCP-chat written with C++." << std::endl;
+    std::cout << "Made by A.Koposov" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Now enter your credentials:" << std::endl;
+
     ChatClient client;
 
     int iResult = 0;
     char recv_buf[512];
     std::string login_str;
     std::string password_str;
-    std::cout << "Enter Login:" << std::endl;
+    std::cout << "Enter Login: ";
     std::cin >> login_str;
-    std::cout << "Enter Password:" << std::endl;
+    std::cout << "Enter Password: ";
     std::cin >> password_str;
 
-    if (!client.Authenticate(login_str, password_str)) {
-        return 1;
+    bool not_auth = !client.Authenticate(login_str, password_str);
+    while (not_auth) {
+        std::cout << "Your credentials are incorrect! Try one more time..." << std::endl;
+        not_auth = !client.Authenticate(login_str, password_str);
     }
 
-    std::string other_user;
+    system("cls");
+    std::cout << "Hello, " << client.GetLogin() << "! Welcome..." << std::endl;
+    std::cout << "Get chat with: ";
 
-    std::cout << "Get chat with:";
+    std::string other_user;
     std::cin >> other_user;
 
     std::cout << client.GetChatHistory(other_user);
 
-    std::string message;
+    while(1) {
+        std::cout << "Enter your message: ";
 
-    std::cout << "Enter your message: ";
-    std::cin >> message;
-    client.SendMes(other_user, message);
-
-    std::cout << client.GetChatHistory(other_user);
+        std::string message;
+        std::cin >> message;
+        client.SendMes(other_user, message);
+        system("cls");
+        std::cout << client.GetChatHistory(other_user);
+    }
 
 
 
